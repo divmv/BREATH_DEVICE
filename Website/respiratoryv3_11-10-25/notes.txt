@@ -1,0 +1,13 @@
+
+# Notes for Running the application
+To run app.py:  
+- Open command prompt  
+- Navigate to this directory (into the directory storing the app): 
+`cd "respiratoryv3"`
+or
+`cd "C:\Users\rmparti\Desktop\MohamedBreathApp2 Bacteria 2025\respiratoryv3"`
+- Open conda environment with python installation:  
+`conda activate mohamedBreathApp2`
+- Run the python app  
+`python app.py`
+- Visit, in your browser, `http://127.0.0.1:5000/`

@@ -1,0 +1,50 @@
+# Core Flask Framework
+Flask==2.3.3
+Werkzeug==2.3.7
+
+# Data Processing and Analysis
+numpy==1.24.3
+pandas==2.0.3
+scipy==1.11.1
+
+# Machine Learning
+scikit-learn==1.3.0
+antropy==0.1.6
+
+# Visualization
+matplotlib==3.7.2
+
+# Signal Processing (included in scipy, but listing for clarity)
+# scipy includes signal processing functions
+
+# Microsoft Office Integration
+python-pptx==0.6.21
+
+# File Upload Handling (included in Flask)
+# Werkzeug handles file uploads
+
+# Optional: Additional data formats support
+openpyxl==3.1.2
+
+# Optional: Enhanced plotting (if needed)
+seaborn==0.12.2
+
+# System utilities
+uuid
+
+# CSV handling (built-in Python module)
+# csv
+
+# Math operations (built-in Python module) 
+# math
+
+# OS operations (built-in Python module)
+# os
+
+# Pickle serialization (built-in Python module)
+# pickle
+
+
+# Missing from new version:
+antropy
+python-pptx

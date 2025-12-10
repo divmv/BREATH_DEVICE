@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Breath Analysis Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #059669;
+            --warning: #d97706;
+            --error: #dc2626;
+            --medical-blue: #0ea5e9;
+            --medical-green: #10b981;
+            --normal: #059669;
+            --elevated: #d97706;
+            --critical: #dc2626;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--medical-blue) 0%, var(--primary-color) 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgb(0 0 0 / 0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-content h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-subtitle {
+            opacity: 0.9;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .header-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .section {
+            background-color: var(--surface);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 2rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--medical-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .clinical-alert {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 1px solid var(--error);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .clinical-alert.warning {
+            background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+            border-color: var(--warning);
+        }
+
+        .clinical-alert.normal {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-color: var(--success);
+        }
+
+        .alert-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .alert-icon {
+            font-size: 2rem;
+        }
+
+        .alert-text h3 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #fafafa 0%, #f0f9ff 100%);
+            padding: 2rem;
+            border-radius: 1.25rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--medical-blue), var(--primary-color));
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgb(0 0 0 / 0.1);
+        }
+
+        .metric-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--text);
+            text-align: right;
+        }
+
+        .metric-value.normal {
+            color: var(--normal);
+        }
+
+        .metric-value.warning {
+            color: var(--warning);
+        }
+
+        .metric-value.critical {
+            color: var(--critical);
+        }
+
+        .respiratory-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .respiratory-status.normal {
+            background: var(--normal);
+            color: white;
+        }
+
+        .respiratory-status.elevated {
+            background: var(--warning);
+            color: white;
+        }
+
+        .respiratory-status.critical {
+            background: var(--critical);
+            color: white;
+        }
+
+        .plot-section {
+            margin-bottom: 2rem;
+        }
+
+        .plot-category {
+            margin-bottom: 3rem;
+        }
+
+        .plot-category h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 4px solid var(--medical-blue);
+        }
+
+        .plot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2rem;
+        }
+
+        .plot-container {
+            background-color: var(--surface);
+            border-radius: 1.25rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .plot-container:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgb(0 0 0 / 0.1);
+        }
+
+        .plot-header {
+            background: linear-gradient(135deg, var(--medical-blue) 0%, var(--primary-color) 100%);
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .plot-header h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .plot-content {
+            padding: 1.5rem;
+        }
+
+        .plot-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .download-btn {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, var(--medical-blue) 0%, var(--primary-color) 100%);
+            color: white;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgb(37 99 235 / 0.3);
+        }
+
+        .download-btn.secondary {
+            background: linear-gradient(135deg, var(--text-light) 0%, #475569 100%);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--surface) 0%, #f1f5f9 100%);
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 1rem;
+            font-weight: 600;
+            border: 2px solid var(--border);
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        .back-link:hover {
+            background: linear-gradient(135deg, var(--medical-blue) 0%, var(--primary-color) 100%);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .header {
+                padding: 2rem 1.5rem;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-content h1 {
+                font-size: 1.75rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .plot-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .download-buttons {
+                flex-direction: column;
+            }
+
+            .summary-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>🫁 Clinical Breath Analysis Results</h1>
+                <div class="header-subtitle">
+                    Portable breath analyzer system - Clinical respiratory assessment
+                </div>
+            </div>
+            <div class="header-actions">
+                {% if results.summary_csv %}
+                <a href="{{ url_for('download_file', filename=results.summary_csv) }}" class="header-btn">
+                    📊 Summary Report
+                </a>
+                {% endif %}
+                {% if results.powerpoint %}
+                <a href="{{ url_for('download_file', filename=results.powerpoint) }}" class="header-btn">
+                    📋 PowerPoint Report
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Lung Animation Section -->
+        <div id="lung-animation-container" style="width:300px; margin:2rem auto 2rem auto;">
+          <svg id="lung-svg" viewBox="0 0 200 200" width="100%" height="100%">
+            <!-- Left lung -->
+            <ellipse id="left-lung" cx="80" cy="100" rx="40" ry="60" fill="#90caf9" opacity="0.8"/>
+            <!-- Right lung -->
+            <ellipse id="right-lung" cx="120" cy="100" rx="40" ry="60" fill="#90caf9" opacity="0.8"/>
+            <!-- Trachea -->
+            <rect x="95" y="30" width="10" height="40" fill="#bdbdbd"/>
+          </svg>
+          <div style="text-align:center; margin-top:10px;">
+            <span id="lung-metric-label" style="font-size:1.2em; font-weight:bold;"></span>
+          </div>
+        </div>
+        <!-- End Lung Animation Section -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          // Animate lungs based on tidal volume and breathing rate
+          const tidalVolume = {{ results['TV_mean']|default(0.5)|tojson }};
+          const breathingRate = {{ results['breathing_rate']|default(12)|tojson }};
+          const vitalCapacity = {{ results['vital_capacity']|default(3.0)|tojson }};
+          const ExhaleVolume = {{ results['avg_exh_vol']|default(0)|tojson }};
+
+          // Update the lung metric label to include exhalation volume
+          let labelText = `Tidal Volume: ${tidalVolume.toFixed(1)} mL | RR: ${breathingRate.toFixed(1)} bpm | VC: ${vitalCapacity.toFixed(2)}`;
+          if (ExhaleVolume && ExhaleVolume > 0) {
+            labelText += ` | Exh Vol: ${ExhaleVolume.toFixed(1)} mL`;
+          }
+          document.getElementById('lung-metric-label').innerText = labelText;
+
+          const leftLung = document.getElementById('left-lung');
+          const rightLung = document.getElementById('right-lung');
+          let t = 0;
+          const baseRy = 60;
+          const baseRx = 40;
+          const amplitude = Math.max(10, Math.min(30, tidalVolume * 60));
+
+          function animateLungs() {
+            const period = 60 / Math.max(1, breathingRate);
+            const phase = Math.sin((2 * Math.PI * t) / period);
+            const ry = baseRy + amplitude * phase * 0.5;
+            leftLung.setAttribute('ry', ry);
+            rightLung.setAttribute('ry', ry);
+            t += 0.05;
+            requestAnimationFrame(animateLungs);
+          }
+          animateLungs();
+        });
+        </script>
+
+        <!-- Clinical Alert System -->
+        {% set rr = results.respiratory_rate or results.breathing_rate or 0 %}
+        {% if rr > 30 %}
+        <div class="clinical-alert" style="display: block;">
+            <div class="alert-content">
+                <div class="alert-icon">🚨</div>
+                <div class="alert-text">
+                    <h3 style="color: var(--critical);">Critical Alert: Pneumonia Risk</h3>
+                    <p>Respiratory rate > 30 breaths/min indicates potential pneumonia. Immediate clinical evaluation recommended.</p>
+                </div>
+            </div>
+        </div>
+        {% elif rr > 27 %}
+        <div class="clinical-alert warning" style="display: block;">
+            <div class="alert-content">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-text">
+                    <h3 style="color: var(--warning);">Warning: Cardiac Risk</h3>
+                    <p>Respiratory rate > 27 breaths/min over 72 hours is a strong predictor for cardiac arrest.</p>
+                </div>
+            </div>
+        </div>
+        {% elif rr >= 12 and rr <= 20 %}
+        <div class="clinical-alert normal" style="display: block;">
+            <div class="alert-content">
+                <div class="alert-icon">✅</div>
+                <div class="alert-text">
+                    <h3 style="color: var(--success);">Normal Respiratory Pattern</h3>
+                    <p>Respiratory rate within normal range (12-20 breaths/min). No immediate concerns detected.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Summary Statistics -->
+        <div class="section">
+            <h2>
+                <span>📈</span>
+                Quick Overview
+            </h2>
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <span class="stat-number">{{ results.total_samples or 0 }}</span>
+                    <div class="stat-label">Data Points</div>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">{{ "%.1f" | format(results.test_duration_sec or 0) }}s</span>
+                    <div class="stat-label">Test Duration</div>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">{{ "%.1f" | format(rr) }}</span>
+                    <div class="stat-label">Breaths/min</div>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">{{ "%.1f" | format(results.power_variation_coefficient or 0) }}%</span>
+                    <div class="stat-label">Signal Variation</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clinical Metrics -->
+        <div class="section">
+            <h2>
+                <span>⚕️</span>
+                Clinical Assessment
+            </h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>
+                        <span>🔄</span>
+                        Respiratory Pattern
+                    </h3>
+                    <div class="metric">
+                        <span class="metric-label">Respiratory Rate</span>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                            <span class="metric-value {% if rr > 30 %}critical{% elif rr > 27 %}warning{% elif rr >= 12 and rr <= 20 %}normal{% endif %}">
+                                {{ "%.1f" | format(rr) }} breaths/min
+                            </span>
+                            <span class="respiratory-status {% if rr > 30 %}critical{% elif rr > 27 %}elevated{% elif rr >= 12 and rr <= 20 %}normal{% else %}warning{% endif %}">
+                                {% if rr > 30 %}
+                                🚨 Critical
+                                {% elif rr > 27 %}
+                                ⚠️ Elevated
+                                {% elif rr >= 12 and rr <= 20 %}
+                                ✅ Normal
+                                {% else %}
+                                ⚠️ Abnormal
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Detected Breath Peaks</span>
+                        <span class="metric-value">{{ results.num_peaks or 0 }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Average Tidal Volume</span>
+                        <span class="metric-value">
+                            {% if results.TV_mean or results.avg_tidal_volume %}
+                                {{ "%.1f" | format(results.TV_mean or results.avg_tidal_volume) }} mL
+                            {% else %}
+                                Insufficient data
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <h3>
+                        <span>🫁</span>
+                        Lung Function
+                    </h3>
+                    <div class="metric">
+                        <span class="metric-label">Vital Capacity (Relative)</span>
+                        <span class="metric-value">{{ "%.2f" | format(results.vital_capacity or 0) }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Lung Capacity (Peak-to-Peak)</span>
+                        <span class="metric-value">{{ "%.4f" | format(results.LC_ptp or 0) }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Average Exhalation Volume</span>
+                        <span class="metric-value">
+                            {% if results.avg_exh_vol %}
+                                {{ "%.2f" | format(results.avg_exh_vol) }} mL
+                            {% else %}
+                                Insufficient data
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Beam Displacement Range</span>
+                        <span class="metric-value">{{ "%.4f" | format(results.beam_displacement_range or 0) }}</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <h3>
+                        <span>📊</span>
+                        Signal Quality
+                    </h3>
+                    <div class="metric">
+                        <span class="metric-label">Power Variation (CV)</span>
+                        <span class="metric-value {% if results.power_variation_coefficient and results.power_variation_coefficient > 5 %}normal{% else %}warning{% endif %}">
+                            {{ "%.1f" | format(results.power_variation_coefficient or 0) }}%
+                        </span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Shannon Entropy</span>
+                        <span class="metric-value">{{ "%.4f" | format(results.shannon_entropy or 0) }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Signal Quality</span>
+                        <span class="metric-value {% if results.power_variation_coefficient and results.power_variation_coefficient > 5 %}normal{% else %}warning{% endif %}">
+                            {% if results.power_variation_coefficient and results.power_variation_coefficient > 5 %}
+                                ✅ Good
+                            {% else %}
+                                ⚠️ Low variation
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <h3>
+                        <span>🔬</span>
+                        Advanced Metrics
+                    </h3>
+                    <div class="metric">
+                        <span class="metric-label">FVC (Forced Vital Capacity)</span>
+                        <span class="metric-value">{{ '%.2f' % ((results.FVC or 0) / 1000) }} L</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">FEV1 (1-sec volume)</span>
+                        <span class="metric-value">{{ '%.2f' % ((results.FEV1 or 0) / 1000) }} L</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">FEV1/FVC Ratio</span>
+                        <span class="metric-value {% if results.FEV1_FVC_ratio and results.FEV1_FVC_ratio < 70 %}warning{% else %}normal{% endif %}">
+                            {{ '%.1f' % (results.FEV1_FVC_ratio or 0) }}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Neural Network Training -->
+        {% if results.neural_network_ready %}
+        <div class="section">
+            <h2>
+                <span>🧠</span>
+                Automatic Neural Network Training System
+            </h2>
+            
+            {% if results.auto_training_completed %}
+            <div style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); padding: 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem; border-left: 4px solid #059669;">
+                <p style="color: #059669; margin-bottom: 1rem; font-weight: 600;">
+                    <strong>🎉 Automatic Training Completed!</strong> 
+                </p>
+                <p style="color: #047857; margin-bottom: 0.5rem;">
+                    Machine learning models have been automatically trained on your accumulated data. The system is now ready for production use with intelligent peak detection.
+                </p>
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.4); border-radius: 0.5rem;">
+                    <strong>Training Status:</strong> ✅ Complete<br>
+                    <strong>Best Model:</strong> {{ results.auto_trained_models.best_model or 'Random Forest' }}<br>
+                    <strong>Models Available:</strong> Random Forest, SVM, Logistic Regression<br>
+                    <strong>Ready for Deployment:</strong> Yes
+                </div>
+            </div>
+            {% elif results.auto_training_progress %}
+            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem; border-left: 4px solid #d97706;">
+                <p style="color: #d97706; margin-bottom: 1rem; font-weight: 600;">
+                    <strong>📊 Collecting Training Data...</strong> 
+                </p>
+                <p style="color: #92400e; margin-bottom: 0.5rem;">
+                    The system is automatically accumulating training data from multiple analyses. Automatic training will begin when sufficient data is collected.
+                </p>
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.4); border-radius: 0.5rem;">
+                    <strong>Progress:</strong> {{ results.auto_training_progress }} samples<br>
+                    <strong>Target:</strong> 30 samples for automatic training<br>
+                    <strong>Status:</strong> Accumulating data from multiple patients
+                </div>
+                <div style="margin-top: 1rem; background: rgba(217, 119, 6, 0.1); padding: 1rem; border-radius: 0.5rem;">
+                    <strong>📈 Progress Bar:</strong>
+                    <div style="width: 100%; background: #e5e7eb; border-radius: 0.5rem; margin-top: 0.5rem;">
+                        <div style="width: 15%; background: linear-gradient(90deg, #d97706, #f59e0b); height: 8px; border-radius: 0.5rem; transition: width 0.3s ease;"></div>
+                    </div>
+                    <small style="color: #92400e;">{{ results.auto_training_progress or 'Initializing...' }}</small>
+                </div>
+            </div>
+            {% else %}
+            <div style="background: linear-gradient(135deg, #f3e8ff 0%, #e879f9 100%); padding: 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem;">
+                <p style="color: #6b21a8; margin-bottom: 1rem; font-weight: 600;">
+                    <strong>AI-Ready Training Data Generated!</strong> 
+                </p>
+                <p style="color: #7c3aed; margin-bottom: 0.5rem;">
+                    Your respiratory signal has been processed using our traditional multi-strategy peak detection to automatically train machine learning models for enhanced peak detection.
+                </p>
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.3); border-radius: 0.5rem;">
+                    <strong>Training Samples Generated:</strong> {{ results.training_samples_generated or 0 }}<br>
+                    <strong>Models Available:</strong> Random Forest, SVM, Logistic Regression<br>
+                    <strong>Framework:</strong> Scikit-learn with automatic optimization
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="metric-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                <div class="metric-card">
+                    <h3>
+                        <span>📊</span>
+                        Training Data
+                    </h3>
+                    <div class="metric">
+                        <span class="metric-label">Current Session Samples</span>
+                        <span class="metric-value">{{ results.training_samples_generated or 0 }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Traditional Peaks Detected</span>
+                        <span class="metric-value">{{ results.num_peaks or 0 }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Signal Quality Score</span>
+                        <span class="metric-value">{{ "%.1f" | format(results.power_variation_coefficient or 0) }}%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Ground Truth Method</span>
+                        <span class="metric-value">Multi-Strategy Detection</span>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <h3>
+                        <span>🚀</span>
+                        Auto-Training Status
+                    </h3>
+                    {% if results.auto_training_completed %}
+                    <div class="metric">
+                        <span class="metric-label">Training Status</span>
+                        <span class="metric-value" style="color: #059669;">✅ Complete</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Best Model</span>
+                        <span class="metric-value">{{ results.auto_trained_models.best_model or 'Random Forest' }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Models Trained</span>
+                        <span class="metric-value">3 (RF, SVM, LogReg)</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Ready for Production</span>
+                        <span class="metric-value" style="color: #059669;">Yes</span>
+                    </div>
+                    {% elif results.auto_training_progress %}
+                    <div class="metric">
+                        <span class="metric-label">Training Status</span>
+                        <span class="metric-value" style="color: #d97706;">📊 Collecting Data</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Progress</span>
+                        <span class="metric-value">{{ results.auto_training_progress }}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Next Step</span>
+                        <span class="metric-value">Analyze more patients</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Auto-Training</span>
+                        <span class="metric-value" style="color: #d97706;">Enabled</span>
+                    </div>
+                    {% else %}
+                    <div class="metric">
+                        <span class="metric-label">Random Forest</span>
+                        <span class="metric-value">100 trees + feature importance</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">SVM Model</span>
+                        <span class="metric-value">RBF kernel + probability output</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Logistic Regression</span>
+                        <span class="metric-value">L2 regularization + feature scaling</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Auto-Training</span>
+                        <span class="metric-value" style="color: #10b981;">Active</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+                        <div class="download-buttons" style="gap: 1rem; flex-wrap: wrap; margin-top: 2rem;">
+                <!-- Only show actual ML model files for download -->
+                {% if results.auto_trained_models %}
+                    {% if results.auto_trained_models.random_forest %}
+                    <a href="{{ url_for('download_file', filename=results.auto_trained_models.random_forest) }}" class="download-btn" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                        🌳 Random Forest Model
+                    </a>
+                    {% endif %}
+                    {% if results.auto_trained_models.svm %}
+                    <a href="{{ url_for('download_file', filename=results.auto_trained_models.svm) }}" class="download-btn" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                        🎯 SVM Model
+                    </a>
+                    {% endif %}
+                    {% if results.auto_trained_models.logistic_regression %}
+                    <a href="{{ url_for('download_file', filename=results.auto_trained_models.logistic_regression) }}" class="download-btn" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);">
+                        📈 Logistic Regression Model
+                    </a>
+                    {% endif %}
+                    {% if results.auto_trained_models.deployment_script %}
+                    <a href="{{ url_for('download_file', filename=results.auto_trained_models.deployment_script) }}" class="download-btn" style="background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);">
+                        🚀 Deployment Script
+                    </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <div style="background: #f8fafc; padding: 1.5rem; border-radius: 1rem; margin-top: 1.5rem; border-left: 4px solid #8b5cf6;">
+                {% if results.auto_training_completed %}
+                <h4 style="color: #6b21a8; margin-bottom: 1rem;">🎉 Production Ready!</h4>
+                
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(139, 92, 246, 0.1); border-radius: 0.5rem;">
+                    <strong style="color: #8b5cf6;">🚀 Next Steps:</strong> Download the trained models 
+                </div>
+                {% elif results.auto_training_progress %}
+                <h4 style="color: #d97706; margin-bottom: 1rem;">📊 Automatic Training in Progress</h4>
+                <p style="color: #64748b; line-height: 1.6; margin-bottom: 1rem;">
+                    The system is automatically collecting training data from multiple patient analyses. When 30 samples are reached, machine learning models will train automatically in the background.
+                </p>
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(217, 119, 6, 0.1); border-radius: 0.5rem;">
+                    <strong style="color: #d97706;">💡 Tip:</strong> Continue analyzing different patients to reach the training threshold faster!
+                </div>
+                {% else %}
+                <h4 style="color: #6b21a8; margin-bottom: 1rem;">🚀 Automatic Training Enabled</h4>
+                <p style="color: #64748b; line-height: 1.6; margin-bottom: 1rem;">
+                    The system will automatically train machine learning models when sufficient data is collected from multiple analyses. No manual intervention required.
+                </p>
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(139, 92, 246, 0.1); border-radius: 0.5rem;">
+                    <strong style="color: #8b5cf6;">💡 Tip:</strong> Continue analyzing patients to trigger automatic training at just 10-30 samples!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Data Downloads -->
+        <div class="section">
+            <h2>
+                <span>💾</span>
+                Download Processed Data
+            </h2>
+            <div class="download-buttons" style="gap: 1rem; flex-wrap: wrap;">
+                {% if results.processed_data_csv %}
+                <a href="{{ url_for('download_file', filename=results.processed_data_csv) }}" class="download-btn">
+                    📈 Processed Signal Data (CSV)
+                </a>
+                {% endif %}
+                {% if results.summary_csv %}
+                <a href="{{ url_for('download_file', filename=results.summary_csv) }}" class="download-btn">
+                    📋 Summary Metrics (CSV)
+                </a>
+                {% endif %}
+                {% if results.high_entropy_csv %}
+                <a href="{{ url_for('download_file', filename=results.high_entropy_csv) }}" class="download-btn secondary">
+                    🎯 High Entropy Segments
+                </a>
+                {% endif %}
+                {% if results.clusters_csv %}
+                <a href="{{ url_for('download_file', filename=results.clusters_csv) }}" class="download-btn secondary">
+                    🔍 Breathing Clusters
+                </a>
+                {% endif %}
+                {% if results.pca_csv %}
+                <a href="{{ url_for('download_file', filename=results.pca_csv) }}" class="download-btn secondary">
+                    🎯 PCA Analysis Data
+                </a>
+                {% endif %}
+                {% if results.kmeans_csv %}
+                <a href="{{ url_for('download_file', filename=results.kmeans_csv) }}" class="download-btn secondary">
+                    🎲 K-Means Clustering Data
+                </a>
+                {% endif %}
+                {% if results.feature_importance_csv %}
+                <a href="{{ url_for('download_file', filename=results.feature_importance_csv) }}" class="download-btn secondary">
+                    🏆 ML Feature Importance
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Tecplot Exports -->
+        <div class="section">
+            <h2>
+                <span>📊</span>
+                Tecplot Data Exports
+            </h2>
+            <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem;">
+                <p style="color: var(--text-light); margin-bottom: 1rem;">
+                    <strong>Tecplot Format:</strong> These .dat files can be imported directly into Tecplot for advanced visualization and analysis.
+                </p>
+            </div>
+            <div class="download-buttons" style="gap: 1rem; flex-wrap: wrap;">
+                {% if results.signal_tecplot %}
+                <a href="{{ url_for('download_file', filename=results.signal_tecplot) }}" class="download-btn">
+                    📈 Signal Processing Data
+                </a>
+                {% endif %}
+                {% if results.peak_detection_tecplot %}
+                <a href="{{ url_for('download_file', filename=results.peak_detection_tecplot) }}" class="download-btn">
+                    🔍 Peak Detection Data
+                </a>
+                {% endif %}
+                {% if results.breathing_tecplot %}
+                <a href="{{ url_for('download_file', filename=results.breathing_tecplot) }}" class="download-btn">
+                    🫁 Breathing Pattern Data
+                </a>
+                {% endif %}
+                {% if results.entropy_tecplot %}
+                <a href="{{ url_for('download_file', filename=results.entropy_tecplot) }}" class="download-btn">
+                    📊 Entropy Analysis Data
+                </a>
+                {% endif %}
+                {% if results.rolling_shannon_tecplot %}
+                <a href="{{ url_for('download_file', filename=results.rolling_shannon_tecplot) }}" class="download-btn">
+                    🌊 Rolling Shannon Entropy
+                </a>
+                {% endif %}
+                {% if results.pca_tecplot %}
+                <a href="{{ url_for('download_file', filename=results.pca_tecplot) }}" class="download-btn">
+                    🎯 PCA Analysis Data
+                </a>
+                {% endif %}
+                {% if results.kmeans_tecplot %}
+                <a href="{{ url_for('download_file', filename=results.kmeans_tecplot) }}" class="download-btn">
+                    🎲 K-Means Clustering Data
+                </a>
+                {% endif %}
+                {% if results.feature_importance_tecplot %}
+                <a href="{{ url_for('download_file', filename=results.feature_importance_tecplot) }}" class="download-btn">
+                    🏆 Feature Importance Data
+                </a>
+                {% endif %}
+                {% if results.beam_trajectory_tecplot %}
+                <a href="{{ url_for('download_file', filename=results.beam_trajectory_tecplot) }}" class="download-btn">
+                    🎯 Beam Trajectory Data
+                </a>
+                {% endif %}
+                {% if results.frequency_analysis_tecplot %}
+                <a href="{{ url_for('download_file', filename=results.frequency_analysis_tecplot) }}" class="download-btn">
+                    📡 Frequency Analysis Data
+                </a>
+                {% endif %}
+                {% if results.breathing_cycles_tecplot %}
+                <a href="{{ url_for('download_file', filename=results.breathing_cycles_tecplot) }}" class="download-btn">
+                    🔄 Breathing Cycles Data
+                </a>
+                {% endif %}
+                {% if results.clinical_metrics_tecplot %}
+                <a href="{{ url_for('download_file', filename=results.clinical_metrics_tecplot) }}" class="download-btn">
+                    ⚕️ Clinical Metrics Data
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Visualizations -->
+        <div class="section">
+            <h2>
+                <span>📊</span>
+                Analysis Visualizations
+            </h2>
+            <div class="plot-section">
+                {% for plot_group_title, plot_paths in results.plot_files.items() %}
+                <div class="plot-category">
+                    <h3>{{ plot_group_title }}</h3>
+                    <div class="plot-grid">
+                        {% for plot_title, plot_path in plot_paths.items() %}
+                        <div class="plot-container">
+                            <div class="plot-header">
+                                <h4>{{ plot_title }}</h4>
+                            </div>
+                            <div class="plot-content">
+                                {% if plot_path %}
+                                <img src="{{ url_for('download_file', filename=plot_path) }}" alt="{{ plot_title }}" loading="lazy" onerror="this.onerror=null; console.log('Failed to load plot: {{ plot_path }}'); this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_15ba800aa1d%20text%20%7B%20fill%3A%23AAAAAA%3Bfont-weight%3Abold%3Bfont-family%3AArial%2C%20Helvetica%2C%20Open%20Sans%2C%20sans-serif%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_15ba800aa1d%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23EEEEEE%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.921875%22%20y%3D%22217.7%22%3EFailed%20to%20load%20plot%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E';">
+                                {% else %}
+                                <div style="background: #f8f9fa; padding: 2rem; text-align: center; border-radius: 0.5rem;">
+                                    <p style="color: #6c757d; margin-bottom: 0.5rem;">Plot not available</p>
+                                    <small style="color: #adb5bd;">Debug: plot_path is empty for {{ plot_title }}</small>
+                                </div>
+                                {% endif %}
+                                <div class="download-buttons">
+                                    {% if plot_path %}
+                                    <a href="{{ url_for('download_file', filename=plot_path) }}" download class="download-btn">
+                                        📥 Download Plot
+                                    </a>
+                                    {% endif %}
+                                    
+                                    <!-- Tecplot Export Buttons for ALL plot types -->
+                                    {% if 'Signal' in plot_title and results.signal_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.signal_tecplot) }}" class="download-btn secondary">
+                                        📊 Export to Tecplot
+                                    </a>
+                                    {% elif 'Breathing Pattern' in plot_title and results.breathing_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.breathing_tecplot) }}" class="download-btn secondary">
+                                        📊 Export to Tecplot
+                                    </a>
+                                    {% elif 'Clinical Assessment' in plot_title and results.peaks_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.peaks_tecplot) }}" class="download-btn secondary">
+                                        📊 Peaks Data (Tecplot)
+                                    </a>
+                                    {% elif 'Peak Detection' in plot_title and results.peak_detection_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.peak_detection_tecplot) }}" class="download-btn secondary">
+                                        📊 Export to Tecplot
+                                    </a>
+                                    {% elif 'Shannon Entropy' in plot_title and results.entropy_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.entropy_tecplot) }}" class="download-btn secondary">
+                                        📊 Export to Tecplot
+                                    </a>
+                                    {% elif 'Rolling Shannon' in plot_title and results.rolling_shannon_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.rolling_shannon_tecplot) }}" class="download-btn secondary">
+                                        📊 Export to Tecplot
+                                    </a>
+                                    {% elif 'Rolling Entropy' in plot_title and results.entropy_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.entropy_tecplot) }}" class="download-btn secondary">
+                                        📊 Export to Tecplot
+                                    </a>
+                                    {% elif 'High Entropy' in plot_title and results.entropy_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.entropy_tecplot) }}" class="download-btn secondary">
+                                        📊 Export to Tecplot
+                                    </a>
+                                    {% elif 'PCA Analysis' in plot_title and results.pca_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.pca_tecplot) }}" class="download-btn secondary">
+                                        📊 PCA Data (Tecplot)
+                                    </a>
+                                    {% elif 'PCA Components' in plot_title and results.pca_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.pca_tecplot) }}" class="download-btn secondary">
+                                        📊 Export to Tecplot
+                                    </a>
+                                    {% if results.pca_csv %}
+                                    <a href="{{ url_for('download_file', filename=results.pca_csv) }}" class="download-btn">
+                                        📊 Download CSV
+                                    </a>
+                                    {% endif %}
+                                    {% elif 'PC1 vs PC2' in plot_title and results.pca_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.pca_tecplot) }}" class="download-btn secondary">
+                                        📊 Export to Tecplot
+                                    </a>
+                                    {% if results.pca_csv %}
+                                    <a href="{{ url_for('download_file', filename=results.pca_csv) }}" class="download-btn">
+                                        📊 Download CSV
+                                    </a>
+                                    {% endif %}
+                                    {% elif 'Clustering' in plot_title and results.clustering_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.clustering_tecplot) }}" class="download-btn secondary">
+                                        📊 Clustering Data (Tecplot)
+                                    </a>
+                                    {% elif 'K-Means' in plot_title and results.kmeans_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.kmeans_tecplot) }}" class="download-btn secondary">
+                                        📊 Export to Tecplot
+                                    </a>
+                                    {% if results.kmeans_csv %}
+                                    <a href="{{ url_for('download_file', filename=results.kmeans_csv) }}" class="download-btn">
+                                        📊 Download CSV
+                                    </a>
+                                    {% endif %}
+                                    {% elif 'Feature Importance' in plot_title and results.feature_importance_tecplot %}
+                                    <a href="{{ url_for('download_file', filename=results.feature_importance_tecplot) }}" class="download-btn secondary">
+                                        📊 Export to Tecplot
+                                    </a>
+                                    {% if results.feature_importance_csv %}
+                                    <a href="{{ url_for('download_file', filename=results.feature_importance_csv) }}" class="download-btn">
+                                        📊 Download CSV
+                                    </a>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Clinical Interpretation Guide -->
+        <div class="section">
+            <h2>
+                <span>📚</span>
+                Clinical Reference
+            </h2>
+            <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 2rem; border-radius: 1rem; border-left: 4px solid var(--medical-blue);">
+                <h4 style="color: var(--primary-color); margin-bottom: 1rem;">Interpretation Guidelines</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <h5 style="color: var(--text); margin-bottom: 0.5rem;">Respiratory Rate (RR)</h5>
+                        <ul style="color: var(--text-light); line-height: 1.6; margin-left: 1rem;">
+                            <li><strong>Normal:</strong> 12-20 breaths/min</li>
+                            <li><strong>Tachypnea:</strong> > 20 breaths/min</li>
+                            <li><strong>Cardiac Risk:</strong> > 27 breaths/min</li>
+                            <li><strong>Pneumonia Risk:</strong> > 30 breaths/min</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h5 style="color: var(--text); margin-bottom: 0.5rem;">FEV1/FVC Ratio</h5>
+                        <ul style="color: var(--text-light); line-height: 1.6; margin-left: 1rem;">
+                            <li><strong>Normal:</strong> ≥ 70%</li>
+                            <li><strong>Mild Obstruction:</strong> 60-69%</li>
+                            <li><strong>Moderate:</strong> 50-59%</li>
+                            <li><strong>Severe:</strong> < 50%</li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="color: var(--text-light); margin-top: 1rem; font-size: 0.9rem;">
+                    <strong>Note:</strong> This portable breath analyzer provides preliminary assessment. 
+                    Clinical correlation and standard spirometry should be performed for definitive diagnosis.
+                </p>
+            </div>
+        </div>
+
+        <a href="{{ url_for('index') }}" class="back-link">
+            <span>←</span>
+            Analyze Another Sample
+        </a>
+    </div>
+
+    <script>
+        // Add some interactive features
+        document.addEventListener('DOMContentLoaded', function() {
+            // Highlight critical values
+            const criticalElements = document.querySelectorAll('.metric-value.critical');
+            criticalElements.forEach(el => {
+                el.style.animation = 'pulse 2s infinite';
+            });
+
+            // Add hover effects to metric cards
+            const metricCards = document.querySelectorAll('.metric-card');
+            metricCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(-4px)';
+                });
+            });
+        });
+
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.7; }
+                100% { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

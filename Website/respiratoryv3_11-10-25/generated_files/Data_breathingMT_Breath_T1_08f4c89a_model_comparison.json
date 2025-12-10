@@ -1,0 +1,33 @@
+{
+  "training_metadata": {
+    "total_files_processed": 2,
+    "current_session_samples": 290,
+    "timestamp": "2025-10-13T12:09:43.771808",
+    "auto_trained": true,
+    "training_reason": "Full training threshold reached (580 >= 30)"
+  },
+  "sample_count": 580,
+  "training_timestamp": "2025-10-13T12:09:43.779863",
+  "random_forest": "auto_trained_random_forest_model.pkl",
+  "svm": "auto_trained_svm_model.pkl",
+  "logistic_regression": "auto_trained_logistic_regression_model.pkl",
+  "deployment_script": "auto_trained_peak_detector.py",
+  "best_model": "random_forest",
+  "performance_summary": {
+    "random_forest": {
+      "accuracy": 1.0,
+      "auc": 1.0
+    },
+    "svm": {
+      "accuracy": 0.7413793103448276,
+      "auc": 0.8666666666666667
+    },
+    "logistic_regression": {
+      "accuracy": 0.9137931034482759,
+      "auc": 0.9705426356589147
+    }
+  },
+  "ensemble_gradient_boosting": "ensemble_gradient_boosting_model.pkl",
+  "ensemble_extra_trees": "ensemble_extra_trees_model.pkl",
+  "ensemble_voting_classifier": "ensemble_voting_classifier_model.pkl"
+}

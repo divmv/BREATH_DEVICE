@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portable Breath Analyzer - Clinical Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #059669;
+            --warning: #d97706;
+            --error: #dc2626;
+            --medical-blue: #0ea5e9;
+            --medical-green: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .main-container {
+            background-color: var(--surface);
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            width: 100%;
+            max-width: 42rem;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--medical-blue) 0%, var(--primary-color) 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .content {
+            padding: 2.5rem 2rem;
+        }
+
+        .info-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--medical-blue);
+        }
+
+        .info-section h3 {
+            color: var(--primary-color);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        .info-item .icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--medical-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .upload-section {
+            margin-bottom: 2rem;
+        }
+
+        .upload-area {
+            border: 3px dashed var(--border);
+            border-radius: 1rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--medical-blue);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--medical-blue), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .upload-text {
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .upload-subtext {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .selected-file {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-radius: 0.75rem;
+            border: 1px solid var(--medical-green);
+            display: none;
+            font-weight: 500;
+            color: var(--medical-green);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--medical-blue) 0%, var(--primary-color) 100%);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgb(37 99 235 / 0.3);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgb(37 99 235 / 0.4);
+        }
+
+        .submit-btn:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: var(--error);
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--error);
+            display: none;
+            font-weight: 500;
+        }
+
+        .clinical-info {
+            background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-left: 4px solid var(--warning);
+        }
+
+        .clinical-info h4 {
+            color: var(--warning);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .clinical-ranges {
+            font-size: 0.9rem;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .processing-status {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            .main-container {
+                margin: 0.5rem;
+                border-radius: 1rem;
+            }
+            
+            .header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 1.75rem;
+            }
+            
+            .content {
+                padding: 2rem 1.5rem;
+            }
+            
+            .upload-area {
+                padding: 2rem 1rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <h1>🫁 Portable Breath Analyzer</h1>
+            <p>Clinical respiratory assessment through optical scatter analysis</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-section">
+                <h3>
+                    <span>📊</span>
+                    System Capabilities
+                </h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="icon">RR</span>
+                        <span>Respiratory Rate Detection</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">VC</span>
+                        <span>Vital Capacity Analysis</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">SE</span>
+                        <span>Shannon Entropy Metrics</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">TV</span>
+                        <span>Tidal Volume Estimation</span>
+                    </div>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 1rem;">
+                    Upload CSV data containing Samples, Xpos, Ypos, and Power measurements from the portable breath analyzer device.
+                </p>
+            </div>
+
+            <div id="error-message" class="error-message"></div>
+            
+            <form method="POST" enctype="multipart/form-data" id="upload-form">
+                <div class="upload-section">
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-icon">📁</div>
+                        <div class="upload-text">Drop your breath data CSV file here</div>
+                        <div class="upload-subtext">or click to browse and select file</div>
+                        <input type="file" name="datafile" id="file-input" class="file-input" accept=".csv" required>
+                        <div id="selected-file" class="selected-file">
+                            <span>✅ File ready for analysis</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submit-btn" disabled>
+                    🔬 Start Clinical Analysis
+                </button>
+            </form>
+
+            <div id="processing-status" class="processing-status">
+                <div class="loader" id="loader"></div>
+                <h4 style="color: var(--primary-color); margin-top: 1rem;">Processing breath data...</h4>
+                <p style="color: var(--text-light); font-size: 0.9rem;">
+                    Analyzing respiratory patterns, calculating metrics, and generating clinical assessment
+                </p>
+            </div>
+
+            <div class="clinical-info">
+                <h4>⚕️ Clinical Reference Ranges</h4>
+                <div class="clinical-ranges">
+                    <strong>Normal Respiratory Rate:</strong> 12-20 breaths/min<br>
+                    <strong>Cardiac Risk Indicator:</strong> RR > 27 breaths/min<br>
+                    <strong>Pneumonia Risk Indicator:</strong> RR > 30 breaths/min<br>
+                    <strong>Expected Data Format:</strong> CSV with Samples, Xpos, Ypos, Power columns
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+            const submitBtn = document.getElementById('submit-btn');
+            const errorMessage = document.getElementById('error-message');
+            const selectedFile = document.getElementById('selected-file');
+            const uploadForm = document.getElementById('upload-form');
+            const processingStatus = document.getElementById('processing-status');
+
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // Highlight drop area when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                uploadArea.classList.add('dragover');
+            }
+
+            function unhighlight(e) {
+                uploadArea.classList.remove('dragover');
+            }
+
+            // Handle dropped files
+            uploadArea.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }
+
+            // Handle selected files
+            fileInput.addEventListener('change', function(e) {
+                handleFiles(this.files);
+            });
+
+            function handleFiles(files) {
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.name.toLowerCase().endsWith('.csv')) {
+                        submitBtn.disabled = false;
+                        errorMessage.style.display = 'none';
+                        selectedFile.innerHTML = `<span>✅ ${file.name} (${(file.size / 1024).toFixed(1)} KB)</span>`;
+                        selectedFile.style.display = 'block';
+
+                        // Validate file size (reasonable for breath data)
+                        if (file.size > 50 * 1024 * 1024) { // 50MB limit
+                            errorMessage.textContent = 'File too large. Please upload a CSV file under 50MB.';
+                            errorMessage.style.display = 'block';
+                            submitBtn.disabled = true;
+                            selectedFile.style.display = 'none';
+                        }
+                    } else {
+                        errorMessage.textContent = 'Please upload a CSV file containing breath analyzer data';
+                        errorMessage.style.display = 'block';
+                        submitBtn.disabled = true;
+                        selectedFile.style.display = 'none';
+                    }
+                } else {
+                    // No files were selected
+                    resetSelection();
+                }
+            }
+
+            function resetSelection() {
+                submitBtn.disabled = true;
+                errorMessage.style.display = 'none';
+                selectedFile.style.display = 'none';
+            }
+
+            // Handle form submission
+            uploadForm.addEventListener('submit', function(e) {
+                if (!fileInput.files.length) {
+                    e.preventDefault();
+                    errorMessage.textContent = 'Please select a breath data CSV file first';
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+
+                // Show processing status
+                processingStatus.style.display = 'block';
+                submitBtn.disabled = true;
+                submitBtn.textContent = '🔄 Processing...';
+
+                // Hide other elements during processing
+                uploadArea.style.opacity = '0.5';
+                errorMessage.style.display = 'none';
+            });
+
+            // Handle any error messages passed from Flask
+            // This will be processed by Flask template engine
+            const flaskError = '{{ error if error else "" }}';
+            if (flaskError) {
+                errorMessage.textContent = flaskError;
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

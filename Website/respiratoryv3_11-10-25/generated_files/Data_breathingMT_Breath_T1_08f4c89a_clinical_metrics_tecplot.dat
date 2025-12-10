@@ -1,0 +1,8 @@
+TITLE = "Clinical Assessment Metrics"
+VARIABLES = "Metric_Index", "Metric_Value", "Normal_Min", "Normal_Max", "Risk_Level"
+ZONE T="Clinical Metrics Data"
+1	30.001000033334446	12	20	2
+2	4.334673071911418	0.5	5.0	0
+3	324.98749958331945	0.4	0.6	1
+4	5.510685868018299	3.0	6.0	0
+5	1.246351468111429	5.0	20.0	1
